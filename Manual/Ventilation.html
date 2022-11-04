@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1">
+    <title>Ventilation — Keep Talking and Nobody Explodes Module</title>
+    <link rel="stylesheet" type="text/css" href="css/font.css">
+    <link rel="stylesheet" type="text/css" href="css/normalize.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <script src="js/ktane-utils.js"></script>
+    <style>
+        .dark table, table {
+            margin: 1em auto;
+            border: none;
+            text-align: center;
+        }
+        
+        svg { width: 100%; }
+        .full-width { width: 100%; }
+        .dark svg tspan.inv { fill: #DDD; }
+        
+        .red { background-color: #FF000080; }
+        .green { background-color: #00FF0080; }
+        .blue { background-color: #0000FF80; }
+        .mag { background-color: #F0F; }
+        .cyan { background-color: #0FF; }
+        .yel { background-color: #FF0; }
+        
+        .red, .green, .blue, .cyan, .mag, .yel {
+            padding: 2px 2px 0;
+        }
+        .cyan, .mag, .yel { color: #000; }
+        .gray { background-color: #D3D3D3; }
+        .dark .gray { background-color: #444; }
+        
+        .page-footer::before { content: 'Page '; }
+        .page-footer::after { content: ' of 1'; }
+    </style>
+</head>
+<body>
+    <div class="section">
+        <div class="page page-bg-01">
+            <div class="page-header">
+                <span class="page-header-doc-title">Keep Talking and Nobody Explodes Mod</span>
+                <span class="page-header-section-title">Ventilation</span>
+            </div>
+            <div class="page-content">
+                <img src="img/Component/Ventilation.svg" class="diagram">
+                <h2>On the Subject of Ventilation</h2>
+                <p class="flavour-text">*Microwave Noises*</p>
+                <p>The module holds a small fan, 3 fuses, a LOCK switch, an old work light, and a submit lever.</p>
+                <p>Each fuse has an LED above it (HOLD LIGHT). Flipping the lock switch <u>ON</u> will set the LEDs to the fuse states. Flipping it <u>OFF</u> will clear them.</p>
+                <p>The work light will flash a 3 digit code indicated by the number of flashes, then a short pause, looping after a long pause:</p>
+                <ul>
+                    <li><b>FIRST DIGIT:</b> Starting corner for HOLD lights</li>
+                    <li><b>SECOND:</b> How many steps to take on the flowchart <u>(Calculate both)</u>
+                        <ul>
+                            <li><u>HOLD:</u> multiply by the number of batteries (or 6 if none)</li>
+                            <li><u>FUSE:</u> multiply by the number of ports (or 5 if none)</li>
+                        </ul>
+                    </li>
+                    <li><b>THIRD:</b> Starting corner for FUSE states</li>
+                </ul>
+                <p>Use the flowchart below twice to set the three HOLD lights and FUSE states, once for each, then pull the lever to submit the combination and power the fan. Only the submit switch will strike. The lock switch <u>must be on when submitting</u>.</p>
+                <p>For each step on the flowchart, check if the condition is true. If so, take the <u>dotted</u> arrow. If not, take the <u>solid</u> one. The last space will be the correct states for either the HOLD or FUSE.</p>
+                
+                <img src="img/Component/Flowchart.svg" class="full-width">
+            </div>
+            <div class="page-footer relative-footer">1</div>
+        </div>
+    </div>
+</body>
+</html>
