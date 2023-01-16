@@ -14,15 +14,9 @@ MonoBehaviour:
   id: ventilation
   title: Ventilation
   author: Nimsay Ramsey
-  description: 'NOTE: This is not an among us reference. Go away
-
-
-    HTML & PDF links coming soon
-
-    Module ID: ventilation
-
-
-    Manual SVG: GhostSalt'
+  description: "NOTE: This is not an among us reference. Go away\r\n\r\nHTML: https://ktane.timwi.de/HTML/Ventilation.html\r\nPDF:
+    https://ktane.timwi.de/PDF/Ventilation.pdf\r\nModule ID: ventilation\r\n\r\nManual
+    SVG: GhostSalt"
   version: 1
   outputFolder: build
   previewImage: {fileID: 2800000, guid: 6af37220cbd04ac4eb6009415bd93788, type: 3}

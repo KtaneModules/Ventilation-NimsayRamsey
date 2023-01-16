@@ -36,6 +36,8 @@ public class VentilationScript : MonoBehaviour {
 	private bool[] switchLAG = {false, false, false, false};
 	private int[] switchLagFRAMES = {0, 0, 0, 0};
 
+	private bool TPsolveLag = false;
+
 
 	private int errorFRAME = 0;
 	private int errorLAG = 0;
@@ -419,6 +421,7 @@ public class VentilationScript : MonoBehaviour {
 		if (!submitBOOL){
 			Audio.PlaySoundAtTransform("click36", transform);
 			Audio.PlaySoundAtTransform("click8", transform);
+			TPsolveLag = false;
 		} else {
 			Audio.PlaySoundAtTransform("click73", transform);
 			switchLights[4].material = LightColors[0];
@@ -476,11 +479,9 @@ public class VentilationScript : MonoBehaviour {
 		}
 
 		if (moduleSolved) {
-			if(fanSpeed != 29){
-				fanSpeed += 1;
-			}
+			if (submitBOOL && fanSpeed != 29) { fanSpeed += 1; } else if (!submitBOOL && fanSpeed != 0) { fanSpeed -= 1; }
 			FanObject.Rotate(0.0f, fanSpeed, 0.0f);
-			if (fanLAG == 30){
+			if (submitBOOL && fanLAG == 30){
 				if (fanFRAME == 1){
 					Audio.PlaySoundAtTransform("fan_interval_quiet", transform);
 					fanFRAME += 1;
@@ -489,9 +490,9 @@ public class VentilationScript : MonoBehaviour {
 				} else {
 					fanFRAME = 0;
 				}
-			} else if (fanLAG < 30){
+			} else if (submitBOOL && fanLAG < 30){
 				fanLAG += 1;
-			}
+			} else if (!submitBOOL) { fanFRAME = 0; }
 		}
 	}
 
@@ -532,7 +533,7 @@ public class VentilationScript : MonoBehaviour {
 			Audio.PlaySoundAtTransform("tools_04", transform);
 
 			Audio.PlaySoundAtTransform("winch - Marker #8", transform);
-			GetComponent<KMBombModule>().HandlePass();
+			if (!TPsolveLag) { GetComponent<KMBombModule>().HandlePass(); }
 			moduleSolved = true;
 		}
 		return;
@@ -584,6 +585,18 @@ public class VentilationScript : MonoBehaviour {
 		if (split[0].EqualsIgnoreCase("SUBMIT"))
 		{
 			submitLever.OnInteract();
+			yield return new WaitForSeconds(0.1f);
+			TPsolveLag = true;
+			yield return new WaitForSeconds(0.2f);
+			if (submitBOOL) { yield return new WaitForSeconds(0.7f); }
+			submitLever.OnInteract();
+			yield return new WaitForSeconds(0.1f);
+			TPsolveLag = true;
+			if (submitBOOL) {
+				yield return new WaitForSeconds(1.0f);
+				submitLever.OnInteract();
+			}
+			GetComponent<KMBombModule>().HandlePass();
 			yield break;
 		}
 	}
@@ -607,6 +620,8 @@ public class VentilationScript : MonoBehaviour {
 				yield return new WaitForSeconds(0.1f);
 			}
 		}
+		submitLever.OnInteract();
+		yield return new WaitForSeconds(1.0f);
 		submitLever.OnInteract();
 	}
 }
