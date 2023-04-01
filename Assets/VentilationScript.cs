@@ -542,7 +542,7 @@ public class VentilationScript : MonoBehaviour {
 	// Twitch Plays Support by Kilo Bites // Modified by Nimsay Ramsey
 
 #pragma warning disable 414
-	private readonly string TwitchHelpMessage = @"!{0} flip 1-4 to flip a fuse switch || !{0} submit to submit your answer.";
+	private readonly string TwitchHelpMessage = @"!{0} flip/switch 1-4 to flip a fuse switch || !{0} submit to submit your answer.";
 #pragma warning restore 414
 
 	bool isValidPos(string n)
@@ -561,8 +561,7 @@ public class VentilationScript : MonoBehaviour {
 
 		string[] split = command.ToUpperInvariant().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
 
-		if (split[0].EqualsIgnoreCase("FLIP"))
-		{
+		if (split[0].EqualsIgnoreCase("FLIP") || split[0].EqualsIgnoreCase("SWITCH")) {
 			//int numberClicks = 0;
 			int pos = 0;
 			if (split.Length != 2)
@@ -580,10 +579,7 @@ public class VentilationScript : MonoBehaviour {
 			pos = pos - 1;
 			if(pos == 3){lockSwitch.OnInteract();} else {switches[pos].OnInteract();}
 			yield break;
-		}
-		
-		if (split[0].EqualsIgnoreCase("SUBMIT"))
-		{
+		} else if (split[0].EqualsIgnoreCase("SUBMIT")) {
 			submitLever.OnInteract();
 			yield return new WaitForSeconds(0.1f);
 			TPsolveLag = true;
@@ -597,6 +593,9 @@ public class VentilationScript : MonoBehaviour {
 				submitLever.OnInteract();
 			}
 			GetComponent<KMBombModule>().HandlePass();
+			yield break;
+		} else {
+			yield return "sendtochaterror " + split[0] + " is not a valid command!";
 			yield break;
 		}
 	}
