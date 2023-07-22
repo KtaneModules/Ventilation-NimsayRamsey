@@ -94,6 +94,7 @@ public class VentilationScript : MonoBehaviour {
 	private float fanSpeed = 0.0f;
 
 	int solveCount = 0;
+	string[] moduleNames;
 
 	//-----------------------------------------------------//
 
@@ -120,9 +121,11 @@ public class VentilationScript : MonoBehaviour {
 	}
 
 	void InitSolution() {
-		for (int i = 0; i < 3; i++){
-			if (i == 1){errorVAL[i] = UnityEngine.Random.Range(1, 4);} else {errorVAL[i] = UnityEngine.Random.Range(1, 5);}
-			for (int j = 0; j < errorVAL[i]; j++){
+		moduleNames = Bomb.GetModuleNames().ToArray();
+		for (int i = 0; i < 3; i++) {
+			if (i == 1) { errorVAL[i] = UnityEngine.Random.Range(1, 4); }
+			else { errorVAL[i] = UnityEngine.Random.Range(1, 5); }
+			for (int j = 0; j < errorVAL[i]; j++) {
 				errorSET.Add(1);
 				errorSET.Add(0);
 			}
@@ -134,36 +137,39 @@ public class VentilationScript : MonoBehaviour {
 		Debug.LogFormat("[Ventilation #{0}] Error code is [{1}]-[{2}]-[{3}]", moduleId, errorVAL[0], errorVAL[1], errorVAL[2]);
 		Debug.LogFormat("[Ventilation #{0}] Starting corners are [{1}] for HOLD and [{2}] for FUSE", moduleId, errorVAL[0], errorVAL[2]);
 
-		if (Bomb.GetBatteryCount() != 0){stepVALS[0] = errorVAL[1] * Bomb.GetBatteryCount();} else {stepVALS[0] = errorVAL[1] * 6;}
-		if (Bomb.GetPortCount() != 0){stepVALS[1] = errorVAL[1] * Bomb.GetPortCount();} else {stepVALS[1] = errorVAL[1] * 5;}
+		if (Bomb.GetBatteryCount() != 0) { stepVALS[0] = errorVAL[1] * Bomb.GetBatteryCount(); }
+		else { stepVALS[0] = errorVAL[1] * 6; }
+		if (Bomb.GetPortCount() != 0) { stepVALS[1] = errorVAL[1] * Bomb.GetPortCount(); }
+		else { stepVALS[1] = errorVAL[1] * 5; }
 		Debug.LogFormat("[Ventilation #{0}] Number of steps are [{1}] for HOLD and [{2}] for FUSE", moduleId, stepVALS[0], stepVALS[1]);
 
 		LogOUT();
 
 		NavigateFlowchart();
 
-		for (int i = 0; i < 3; i++){
-			if (solutionVals[0, i]){debugOrder[i] = 1;} else {debugOrder[i] = 0;}
-			if (solutionVals[1, i]){debugOrder[i+3] = 1;} else {debugOrder[i+3] = 0;}
+		for (int i = 0; i < 3; i++) {
+			if (solutionVals[0, i]) { debugOrder[i] = 1; }
+			else { debugOrder[i] = 0; }
+			if (solutionVals[1, i]) { debugOrder[i+3] = 1; }
+			else { debugOrder[i+3] = 0; }
 		}
 		Debug.LogFormat("[Ventilation #{0}] Solution is [{1}]-[{2}]-[{3}] in the HOLD and [{4}]-[{5}]-[{6}] for the fuse switches", moduleId, debugOrder[0], debugOrder[1], debugOrder[2], debugOrder[3], debugOrder[4], debugOrder[5]);
 	}
 
-	void LogOUT(){
+	void LogOUT() {
 		solveCount = Bomb.GetSolvableModuleIDs().Count();
-		string[] moduleNames = Bomb.GetModuleNames().ToArray();
 		bool LogBOOL = true;
 		int PRIME = 0;
-		for (int j = 1; j < solveCount+1; j++){
-			if(solveCount % j == 0){
+		for (int j = 1; j < solveCount+1; j++) {
+			if (solveCount % j == 0) {
 				PRIME += 1;
 				//Debug.Log(j);
 			}
-			if(PRIME >= 3 || solveCount == 1){
+			if (PRIME >= 3 || solveCount == 1) {
 				LogBOOL = false;
 				break;
 			}
-			if(j == solveCount){
+			if (j == solveCount) {
 				LogBOOL = true;
 				break;
 			}
@@ -171,8 +177,8 @@ public class VentilationScript : MonoBehaviour {
 		Debug.LogFormat("[Ventilation #{0}] Solvable modules is prime [{1}]", moduleId, LogBOOL);
 
 		LogBOOL = false;
-		foreach (string[] portPlate in Bomb.GetPortPlates()){
-			if(portPlate.Count() == 0){
+		foreach (string[] portPlate in Bomb.GetPortPlates()) {
+			if (portPlate.Count() == 0) {
 				LogBOOL = true;
 				break;
 			}
@@ -188,16 +194,16 @@ public class VentilationScript : MonoBehaviour {
 				//Debug.Log(totalMAZES);
 			}
 		}
-		for (int j = 1; j < solveCount+1; j++){
+		for (int j = 1; j < solveCount+1; j++) {
 			//Debug.Log(j);
-			if(totalMAZES % j == 0){
+			if (totalMAZES % j == 0) {
 				PRIME += 1;
 			}
-			if(PRIME >= 3 || totalMAZES <= 1){
+			if (PRIME >= 3 || totalMAZES <= 1) {
 				LogBOOL = true;
 				break;
 			}
-			if(j == totalMAZES){
+			if (j == totalMAZES) {
 				LogBOOL = false;
 				break;
 			}
@@ -205,7 +211,7 @@ public class VentilationScript : MonoBehaviour {
 		Debug.LogFormat("[Ventilation #{0}] # of MAZE modules is not prime [{1}]", moduleId, LogBOOL);
 
 		LogBOOL = false;
-		if(Bomb.GetSerialNumberNumbers().Count() == 3){LogBOOL = true;}
+		if (Bomb.GetSerialNumberNumbers().Count() == 3) { LogBOOL = true; }
 		Debug.LogFormat("[Ventilation #{0}] Serial Number has exactly 3 digits [{1}]", moduleId, LogBOOL);
 
 		LogBOOL = false;
@@ -217,15 +223,10 @@ public class VentilationScript : MonoBehaviour {
 		Debug.LogFormat("[Ventilation #{0}] Odd # of WIRE modules [{1}]", moduleId, LogBOOL);
 
 		LogBOOL = false;
-		if (BossInfo.GetIgnoredModules("Ventilation").Count() == 0){
-			if(Bomb.GetSolvableModuleNames().Contains("The Generator")){LogBOOL = true;} else {LogBOOL = false;}
-		} else {
-		//DEBUG END
-			foreach (string BossList in BossInfo.GetIgnoredModules("Forget Me Not")){
-				if(Bomb.GetSolvableModuleNames().Contains(BossList)){
-					LogBOOL = true;
-					break;
-				}
+		foreach (string BossList in BossInfo.GetIgnoredModules("Ventilation")) {
+			if (Bomb.GetSolvableModuleNames().Contains(BossList)) {
+				LogBOOL = true;
+				break;
 			}
 		}
 		Debug.LogFormat("[Ventilation #{0}] Bomb contains IGNORED MODULE [{1}]", moduleId, LogBOOL);
@@ -237,11 +238,11 @@ public class VentilationScript : MonoBehaviour {
 				cipherCount += 1;
 			}
 		}
-		if (cipherCount % 3 == 0){LogBOOL = true;}
+		if (cipherCount % 3 == 0) { LogBOOL = true; }
 		Debug.LogFormat("[Ventilation #{0}] CIPHER module count mod 3 is 0 [{1}]", moduleId, LogBOOL);
 
 		LogBOOL = false;
-		if(Bomb.GetOffIndicators().Count() > Bomb.GetOnIndicators().Count()){LogBOOL = true;}
+		if (Bomb.GetOffIndicators().Count() > Bomb.GetOnIndicators().Count()) { LogBOOL = true; }
 		Debug.LogFormat("[Ventilation #{0}] Unlit indicators > lit indicators [{1}]", moduleId, LogBOOL);
 	}
 
@@ -251,11 +252,12 @@ public class VentilationScript : MonoBehaviour {
 		Debug.LogFormat("[Ventilation #{0}] 12-13-14-05", moduleId);
 		Debug.LogFormat("[Ventilation #{0}] 11-16-15-06", moduleId);
 		Debug.LogFormat("[Ventilation #{0}] 10-09-08-07", moduleId);
-		for (int i = 0; i < 2; i++){
+		for (int i = 0; i < 2; i++) {
 			nineSTEP = 0;
-			if (i == 0){currentStep = errorToStep[errorVAL[0] - 1];} else {currentStep = errorToStep[errorVAL[2] - 1];}
-			for (int STEP = 0; STEP < stepVALS[i]; STEP++){
-				if (conditionCheck(STEP + 1)){
+			if (i == 0) { currentStep = errorToStep[errorVAL[0] - 1]; }
+			else { currentStep = errorToStep[errorVAL[2] - 1]; }
+			for (int STEP = 0; STEP < stepVALS[i]; STEP++) {
+				if (conditionCheck(STEP + 1)) {
 					currentStep = stepToPath[currentStep, 1];
 				} else {
 					currentStep = stepToPath[currentStep, 0];
@@ -264,126 +266,118 @@ public class VentilationScript : MonoBehaviour {
 			}
 			//Debug.Log("Ending step is" + currentStep);
 
-			for (int j = 0; j < 3; j++){
+			for (int j = 0; j < 3; j++) {
 				solutionVals[i, j] = stateChart[stepToPath[currentStep, 2], j]; // debugSolveVals[i, j];
 			}
 		}
 	}
 
 	bool conditionCheck(int i) {
-		if (currentStep == 0){ // VERIFIED
-			int PRIME = 0;
-			for (int j = 1; j < solveCount+1; j++){
-				if(Bomb.GetSolvableModuleIDs().Count() % j == 0){
-					PRIME += 1;
-				}
-				if(PRIME >= 3 || Bomb.GetSolvableModuleIDs().Count() == 1){return false;}
-				if(j == Bomb.GetSolvableModuleIDs().Count()){return true;}
-			}
-			return true;
+		int PRIME = 0;
+		//string[] names = Bomb.GetModuleNames().ToArray();
 
-		} else if (currentStep == 1){ // VERIFIED
-			foreach (string[] portPlate in Bomb.GetPortPlates()){
-				if(portPlate.Count() == 0){
-					return true;
-				}
-			}
-			return false;
-
-		} else if (currentStep == 2){ // VERIFIED
-			string[] names = Bomb.GetModuleNames().ToArray();
-			int totalMAZES = 0;
-			int PRIME = 0;
-			for (int x = 0; x < names.Length; x++) {
-				if (names[x].ContainsIgnoreCase("Maze")) {
-					totalMAZES += 1;
-				}
-			}
-			for (int j = 1; j < solveCount+1; j++){
-				if(totalMAZES % j == 0){
-					PRIME += 1;
-				}
-				if(PRIME >= 3 || totalMAZES <= 1){return true;}
-				if(j == totalMAZES){return false;}
-			}
-			return false;// PROBLEM: If totalMAZES == 0 then it'll return false despite 0 not being prime // EDIT maybe not..?
-
-		} else if (currentStep == 3){ // VERIFIED
-			if(Bomb.GetSerialNumberNumbers().Count() == 3){
-				return true;
-			} else {return false;}
-
-		} else if (currentStep == 4){ // VERIFIED
-			if(i % 2 == 1){
-				return true;
-			} else {return false;}
-
-		} else if (currentStep == 5){ // VERIFIED
-			string[] names = Bomb.GetModuleNames().ToArray();
-			bool oddSIMON = false;
-			for (int x = 0; x < names.Length; x++) {
-				if (names[x].ContainsIgnoreCase("Wire")) {
-					oddSIMON = !oddSIMON;
-				}
-			}
-			return oddSIMON;
-
-		} else if (currentStep == 6){
-			//DEBUG
-			if (BossInfo.GetIgnoredModules("Ventilation").Count() == 0){
-				if(Bomb.GetSolvableModuleNames().Contains("The Generator")){return true;} else {return false;}
-			}
-			//DEBUG END
-			foreach (string BossList in BossInfo.GetIgnoredModules("Forget Me Not")){
-				if(Bomb.GetSolvableModuleNames().Contains(BossList)){
-					return true;
-				}
-			}
-			return false;
-
-		} else if (currentStep == 7){
-			if(errorVAL[0] == errorVAL[2]){
-				return true;
-			} else {return false;}
-
-		} else if (currentStep == 8){ // VERIFIED
-			nineSTEP += 1;
-			if(nineSTEP % 2 == 1){
-				return true;
-			} else {return false;}
+		switch (currentStep) {
 			
-		} else if (currentStep == 9){ // VERIFIED
-			string[] names = Bomb.GetModuleNames().ToArray();
-			int cipherCount = 0;
-			for (int x = 0; x < names.Length; x++) {
-				if (names[x].ContainsIgnoreCase("Cipher")) {
-					cipherCount += 1;
+			// Solvable count is prime //
+			case 0:
+				for (int j = 1; j < solveCount+1; j++) {
+					if (Bomb.GetSolvableModuleIDs().Count() % j == 0) {
+						PRIME += 1;
+					}
+					if (PRIME >= 3 || Bomb.GetSolvableModuleIDs().Count() == 1) { return false; }
+					if (j == Bomb.GetSolvableModuleIDs().Count()) { return true; }
 				}
-			}
-			if (cipherCount % 3 == 0){return true;} else {return false;}
-
-		} else if (currentStep == 10){ // VERIFIED
-			if(i % 2 == 1){
 				return true;
-			} else {return false;}
 
-		} else if (currentStep == 11){ // VERIFIED
-			if(Bomb.GetOffIndicators().Count() > Bomb.GetOnIndicators().Count()){
-				return true;
-			} else {return false;}
+			// Empty port plate //
+			case 1:
+				foreach (string[] portPlate in Bomb.GetPortPlates()) {
+					if (portPlate.Count() == 0) { return true; }
+				}
+				return false;
 
-		} else { // VERIFIED
-			if(i % 2 == 0){
-				return true;
-			} else {return false;}
-		} 
+			// "MAZE" count is NOT prime //
+			case 2:
+				int totalMAZES = 0;
+				for (int x = 0; x < moduleNames.Length; x++) {
+					if (moduleNames[x].ContainsIgnoreCase("Maze")) { totalMAZES += 1; }
+				}
+				for (int j = 1; j < solveCount+1; j++) {
+					if (totalMAZES % j == 0) { PRIME += 1; }
+					if (PRIME >= 3 || totalMAZES <= 1) { return true; }
+					if (j == totalMAZES) { return false; }
+				}
+				return false;// PROBLEM: If totalMAZES == 0 then it'll return false despite 0 not being prime // EDIT maybe not..?
+
+			// Serial number has exactly 3 numbers //
+			case 3:
+				if (Bomb.GetSerialNumberNumbers().Count() == 3) { return true; }
+				else { return false; }
+
+			// Odd step //
+			case 4:
+				if (i % 2 == 1) { return true; }
+				else { return false; }
+
+			// "WIRE" count is odd //
+			case 5:
+				bool oddSIMON = false;
+				for (int x = 0; x < moduleNames.Length; x++) {
+					if (moduleNames[x].ContainsIgnoreCase("Wire")) {
+						oddSIMON = !oddSIMON;
+					}
+				}
+				return oddSIMON;
+
+			// Bomb contains at least 1 ignored module //
+			case 6:
+				foreach (string BossList in BossInfo.GetIgnoredModules("Ventilation")) {
+					if (Bomb.GetSolvableModuleNames().Contains(BossList)) { return true; }
+				}
+				return false;
+
+			// HOLD start == FUSE start //
+			case 7:
+				if (errorVAL[0] == errorVAL[2]) { return true; }
+				else { return false; }
+
+			// Odd time landing on this space //
+			case 8:
+				nineSTEP += 1;
+				if (nineSTEP % 2 == 1) { return true; }
+				else { return false; }
+
+			// "CIPHER" count is divisible by 3 //
+			case 9:
+				int cipherCount = 0;
+				for (int x = 0; x < moduleNames.Length; x++) {
+					if (moduleNames[x].ContainsIgnoreCase("Cipher")) {
+						cipherCount += 1;
+					}
+				}
+				if (cipherCount % 3 == 0) { return true; }
+				else { return false; }
+
+			// Odd step //
+			case 10:
+				if (i % 2 == 1) { return true; }
+				else { return false; }
+
+			// Unlit indicators > Lit indicators //
+			case 11:
+				if (Bomb.GetOffIndicators().Count() > Bomb.GetOnIndicators().Count()) { return true; }
+				else { return false; }
+		}
+		// Center spaces // Even step //
+		if (i % 2 == 0) { return true; }
+		else { return false; }
 	}
 
 	void FlipSwitch(KMSelectable switchObject) {//KMSelectable button
 		int switchNum = Array.IndexOf(switches, switchObject);
 		//switchObject.AddInteractionPunch();
-		if (switchVal[switchNum] != switchLAG[switchNum]) {return;}
-		if (!switchVal[switchNum]){
+		if (switchVal[switchNum] != switchLAG[switchNum]) { return; }
+		if (!switchVal[switchNum]) {
 			Audio.PlaySoundAtTransform("click37", transform);
 			switchLables[switchNum].material = lableMATS[1];
 		} else {
@@ -395,12 +389,12 @@ public class VentilationScript : MonoBehaviour {
 
 	void LOCKSwitch() {//KMSelectable button
 		//switchObject.AddInteractionPunch();
-		if (switchVal[3] != switchLAG[3]) {return;}
-		if (!switchVal[3]){
+		if (switchVal[3] != switchLAG[3]) { return; }
+		if (!switchVal[3]) {
 			Audio.PlaySoundAtTransform("click7", transform);
 			switchLights[3].material = LightColors[1];
-			for (int i = 0; i < 3; i++){
-				if(switchVal[i]){
+			for (int i = 0; i < 3; i++) {
+				if (switchVal[i]) {
 					switchHOLD[i] = true;
 					switchLights[i].material = LightColors[2];
 				}
@@ -408,7 +402,7 @@ public class VentilationScript : MonoBehaviour {
 		} else {
 			Audio.PlaySoundAtTransform("click45", transform);
 			switchLights[3].material = LightColors[0];
-			for (int i = 0; i < 3; i++){
+			for (int i = 0; i < 3; i++) {
 				switchHOLD[i] = false;
 				switchLights[i].material = LightColors[0];
 			}
@@ -417,8 +411,8 @@ public class VentilationScript : MonoBehaviour {
 	}
 
 	void Submit() {
-		if(submitBOOL != submitLAG){return;}
-		if (!submitBOOL){
+		if (submitBOOL != submitLAG) { return; }
+		if (!submitBOOL) {
 			Audio.PlaySoundAtTransform("click36", transform);
 			Audio.PlaySoundAtTransform("click8", transform);
 			TPsolveLag = false;
@@ -430,29 +424,31 @@ public class VentilationScript : MonoBehaviour {
 	}
 
 	void Update() {
-		if (submitBOOL != submitLAG){
-			if (lagFrames != 10){
-				if (lagFrames < 6){
-					if (submitBOOL){submitLeverObject.Rotate(15.0f, 0.0f, 0.0f);} else {submitLeverObject.Rotate(-15.0f, 0.0f, 0.0f);}
-				} else if (lagFrames == 7){
-					if (submitBOOL){submitLeverObject.Rotate(10.0f, 0.0f, 0.0f);} else {submitLeverObject.Rotate(-10.0f, 0.0f, 0.0f);}
-				} else if (lagFrames == 9){
-					if (submitBOOL){submitLeverObject.Rotate(-10.0f, 0.0f, 0.0f);} else {submitLeverObject.Rotate(10.0f, 0.0f, 0.0f);}
+		if (submitBOOL != submitLAG) {
+			if (lagFrames != 10) {
+				if (lagFrames < 6) {
+					if (submitBOOL) { submitLeverObject.Rotate(15.0f, 0.0f, 0.0f); }
+					else { submitLeverObject.Rotate(-15.0f, 0.0f, 0.0f); }
+				} else if (lagFrames == 7) {
+					if (submitBOOL) { submitLeverObject.Rotate(10.0f, 0.0f, 0.0f); }
+					else { submitLeverObject.Rotate(-10.0f, 0.0f, 0.0f); }
+				} else if (lagFrames == 9) {
+					if (submitBOOL) { submitLeverObject.Rotate(-10.0f, 0.0f, 0.0f); }
+					else { submitLeverObject.Rotate(10.0f, 0.0f, 0.0f); }
 				}
 				lagFrames += 1;
 			} else {
 				lagFrames = 0;
 				submitLAG = submitBOOL;
-				if(submitBOOL){
-					SubmitTest();
-				}
+				if (submitBOOL) { SubmitTest(); }
 			}
 		}
 
-		for (int i = 0; i < 4; i++){
-			if (switchVal[i] != switchLAG[i]){
-				if (switchLagFRAMES[i] != 4){
-					if (switchVal[i]){switchFuseTransforms[i].Rotate(15.0f, 0.0f, 0.0f);} else {switchFuseTransforms[i].Rotate(-15.0f, 0.0f, 0.0f);}
+		for (int i = 0; i < 4; i++) {
+			if (switchVal[i] != switchLAG[i]) {
+				if (switchLagFRAMES[i] != 4) {
+					if (switchVal[i]) { switchFuseTransforms[i].Rotate(15.0f, 0.0f, 0.0f); }
+					else { switchFuseTransforms[i].Rotate(-15.0f, 0.0f, 0.0f); }
 					switchLagFRAMES[i] += 1;
 				} else {
 					switchLagFRAMES[i] = 0;
@@ -461,11 +457,11 @@ public class VentilationScript : MonoBehaviour {
 			}
 		}
 
-		if (errorLAG != errorFRAME + 25){
+		if (errorLAG != errorFRAME + 25) {
 			errorLAG += 1;
-		} else if (errorFRAME < errorSET.Count){
+		} else if (errorFRAME < errorSET.Count) {
 			errorLAG = errorFRAME;
-			if(!switchVal[3]){
+			if (!switchVal[3]) {
 				statusLight.material = LightColors[errorSET[errorFRAME]];
 			} else {
 				statusLight.material = LightColors[0];
@@ -481,42 +477,44 @@ public class VentilationScript : MonoBehaviour {
 		if (moduleSolved) {
 			if (submitBOOL && fanSpeed != 29) { fanSpeed += 1; } else if (!submitBOOL && fanSpeed != 0) { fanSpeed -= 1; }
 			FanObject.Rotate(0.0f, fanSpeed, 0.0f);
-			if (submitBOOL && fanLAG == 30){
-				if (fanFRAME == 1){
+			if (submitBOOL && fanLAG == 30) {
+				if (fanFRAME == 1) {
 					Audio.PlaySoundAtTransform("fan_interval_quiet", transform);
 					fanFRAME += 1;
-				} else if (fanFRAME < 170){
+				} else if (fanFRAME < 170) {
 					fanFRAME += 1;
 				} else {
 					fanFRAME = 0;
 				}
-			} else if (submitBOOL && fanLAG < 30){
+			} else if (submitBOOL && fanLAG < 30) {
 				fanLAG += 1;
 			} else if (!submitBOOL) { fanFRAME = 0; }
 		}
 	}
 
-	void SubmitTest(){
-		for (int i = 0; i < 3; i++){
-			if (switchHOLD[i]){debugOrder[i] = 1;} else {debugOrder[i] = 0;}
-			if (switchVal[i]){debugOrder[i+3] = 1;} else {debugOrder[i+3] = 0;}
+	void SubmitTest() {
+		for (int i = 0; i < 3; i++) {
+			if (switchHOLD[i]) { debugOrder[i] = 1; }
+			else { debugOrder[i] = 0; }
+			if (switchVal[i]) { debugOrder[i+3] = 1; }
+			else { debugOrder[i+3] = 0; }
 		}
-		if (!moduleSolved){
+		if (!moduleSolved) {
 			Debug.LogFormat("[Ventilation #{0}] Power switch pulled! Submitting [{1}]-[{2}]-[{3}] in the HOLD and [{4}]-[{5}]-[{6}] for the fuse switches", moduleId, debugOrder[0], debugOrder[1], debugOrder[2], debugOrder[3], debugOrder[4], debugOrder[5]);
 		}
-		if(!switchVal[3]){
+		if (!switchVal[3]) {
 			switchLights[4].material = LightColors[4];
-			if (!moduleSolved){
+			if (!moduleSolved) {
 				Debug.LogFormat("[Ventilation #{0}] Incomplete Circuit! Strike Recieved...", moduleId);
 				GetComponent<KMBombModule>().HandleStrike();
 			}
 			return;
 		}
-		for (int i = 0; i < 3; i++){
+		for (int i = 0; i < 3; i++) {
 			//Debug.Log((switchHOLD[i] != solutionVals[0, i]) + " // " + (switchVal[i] != solutionVals[1, i]));
-			if(switchHOLD[i] != solutionVals[0, i] || switchVal[i] != solutionVals[1, i]){
+			if (switchHOLD[i] != solutionVals[0, i] || switchVal[i] != solutionVals[1, i]) {
 				switchLights[4].material = LightColors[3];
-				if (!moduleSolved){
+				if (!moduleSolved) {
 					Debug.LogFormat("[Ventilation #{0}] Power Failure! Strike Recieved...", moduleId);
 					GetComponent<KMBombModule>().HandleStrike();
 				}
@@ -524,7 +522,7 @@ public class VentilationScript : MonoBehaviour {
 			}
 		}
 		switchLights[4].material = LightColors[2];
-		if (!moduleSolved){
+		if (!moduleSolved) {
 			Debug.LogFormat("[Ventilation #{0}] Power up Complete! Starting Fan...", moduleId);
 			Audio.PlaySoundAtTransform("click6", transform);//click35
 			Audio.PlaySoundAtTransform("click43", transform);
@@ -577,7 +575,7 @@ public class VentilationScript : MonoBehaviour {
 			int.TryParse(split[1], out pos);
 			//int.TryParse(split[2], out numberClicks);
 			pos = pos - 1;
-			if(pos == 3){lockSwitch.OnInteract();} else {switches[pos].OnInteract();}
+			if (pos == 3) { lockSwitch.OnInteract(); } else { switches[pos].OnInteract(); }
 			yield break;
 		} else if (split[0].EqualsIgnoreCase("SUBMIT")) {
 			submitLever.OnInteract();
@@ -609,10 +607,10 @@ public class VentilationScript : MonoBehaviour {
 			yield return new WaitForSeconds(0.1f);
 		}
 
-		for (int i = 0; i < 2; i++){
-			if(switchVal[3] || i == 1){lockSwitch.OnInteract();}
-			for(int j = 0; j < 3; j++){
-				if (switchVal[j] != solutionVals[i, j]){
+		for (int i = 0; i < 2; i++) {
+			if (switchVal[3] || i == 1) { lockSwitch.OnInteract(); }
+			for (int j = 0; j < 3; j++) {
+				if (switchVal[j] != solutionVals[i, j]) {
 					switches[j].OnInteract();
 					//yield return new WaitForSeconds(0.1f);
 				}
