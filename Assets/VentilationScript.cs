@@ -94,7 +94,12 @@ public class VentilationScript : MonoBehaviour {
 	private float fanSpeed = 0.0f;
 
 	int solveCount = 0;
-	string[] moduleNames;
+	private string[] moduleNames;
+	private string[] solvableModuleNames;
+	private string[] BossList = new string[] {};
+	private List<string[]> PortPlates = new List<string[]> {};
+	private int offIND = 0;
+	private int onIND = 0;
 
 	//-----------------------------------------------------//
 
@@ -117,11 +122,22 @@ public class VentilationScript : MonoBehaviour {
 
 	void Start() {
 		Debug.LogFormat("[Ventilation #{0}] Power Surge in Ventilation! Power reroute required...", moduleId);
+		SetupVariables();
 		InitSolution();
 	}
 
-	void InitSolution() {
+	void SetupVariables() {
 		moduleNames = Bomb.GetModuleNames().ToArray();
+		BossList = BossInfo.GetIgnoredModules("Ventilation");
+		PortPlates = Bomb.GetPortPlates().ToList();
+
+		solvableModuleNames = Bomb.GetSolvableModuleNames().ToArray();
+		offIND = Bomb.GetOffIndicators().Count();
+		onIND = Bomb.GetOnIndicators().Count();
+	}
+
+	void InitSolution() {
+
 		for (int i = 0; i < 3; i++) {
 			if (i == 1) { errorVAL[i] = UnityEngine.Random.Range(1, 4); }
 			else { errorVAL[i] = UnityEngine.Random.Range(1, 5); }
@@ -157,7 +173,7 @@ public class VentilationScript : MonoBehaviour {
 	}
 
 	void LogOUT() {
-		solveCount = Bomb.GetSolvableModuleIDs().Count();
+		solveCount = solvableModuleNames.Count();//Bomb.GetSolvableModuleIDs()
 		bool LogBOOL = true;
 		int PRIME = 0;
 		for (int j = 1; j < solveCount+1; j++) {
@@ -177,7 +193,7 @@ public class VentilationScript : MonoBehaviour {
 		Debug.LogFormat("[Ventilation #{0}] Solvable modules is prime [{1}]", moduleId, LogBOOL);
 
 		LogBOOL = false;
-		foreach (string[] portPlate in Bomb.GetPortPlates()) {
+		foreach (string[] portPlate in PortPlates) {
 			if (portPlate.Count() == 0) {
 				LogBOOL = true;
 				break;
@@ -223,8 +239,8 @@ public class VentilationScript : MonoBehaviour {
 		Debug.LogFormat("[Ventilation #{0}] Odd # of WIRE modules [{1}]", moduleId, LogBOOL);
 
 		LogBOOL = false;
-		foreach (string BossList in BossInfo.GetIgnoredModules("Ventilation")) {
-			if (Bomb.GetSolvableModuleNames().Contains(BossList)) {
+		foreach (string Boss in BossList) {
+			if (solvableModuleNames.Contains(Boss)) {
 				LogBOOL = true;
 				break;
 			}
@@ -242,7 +258,7 @@ public class VentilationScript : MonoBehaviour {
 		Debug.LogFormat("[Ventilation #{0}] CIPHER module count mod 3 is 0 [{1}]", moduleId, LogBOOL);
 
 		LogBOOL = false;
-		if (Bomb.GetOffIndicators().Count() > Bomb.GetOnIndicators().Count()) { LogBOOL = true; }
+		if (offIND > onIND) { LogBOOL = true; }
 		Debug.LogFormat("[Ventilation #{0}] Unlit indicators > lit indicators [{1}]", moduleId, LogBOOL);
 	}
 
@@ -281,17 +297,17 @@ public class VentilationScript : MonoBehaviour {
 			// Solvable count is prime //
 			case 0:
 				for (int j = 1; j < solveCount+1; j++) {
-					if (Bomb.GetSolvableModuleIDs().Count() % j == 0) {
+					if (solvableModuleNames.Count() % j == 0) {
 						PRIME += 1;
 					}
-					if (PRIME >= 3 || Bomb.GetSolvableModuleIDs().Count() == 1) { return false; }
-					if (j == Bomb.GetSolvableModuleIDs().Count()) { return true; }
+					if (PRIME >= 3 || solvableModuleNames.Count() == 1) { return false; }
+					if (j == solvableModuleNames.Count()) { return true; }
 				}
 				return true;
 
 			// Empty port plate //
 			case 1:
-				foreach (string[] portPlate in Bomb.GetPortPlates()) {
+				foreach (string[] portPlate in PortPlates) {
 					if (portPlate.Count() == 0) { return true; }
 				}
 				return false;
@@ -307,7 +323,7 @@ public class VentilationScript : MonoBehaviour {
 					if (PRIME >= 3 || totalMAZES <= 1) { return true; }
 					if (j == totalMAZES) { return false; }
 				}
-				return false;// PROBLEM: If totalMAZES == 0 then it'll return false despite 0 not being prime // EDIT maybe not..?
+				return false;
 
 			// Serial number has exactly 3 numbers //
 			case 3:
@@ -331,8 +347,8 @@ public class VentilationScript : MonoBehaviour {
 
 			// Bomb contains at least 1 ignored module //
 			case 6:
-				foreach (string BossList in BossInfo.GetIgnoredModules("Ventilation")) {
-					if (Bomb.GetSolvableModuleNames().Contains(BossList)) { return true; }
+				foreach (string Boss in BossList) {
+					if (solvableModuleNames.Contains(Boss)) { return true; }
 				}
 				return false;
 
@@ -365,7 +381,7 @@ public class VentilationScript : MonoBehaviour {
 
 			// Unlit indicators > Lit indicators //
 			case 11:
-				if (Bomb.GetOffIndicators().Count() > Bomb.GetOnIndicators().Count()) { return true; }
+				if (offIND > onIND) { return true; }
 				else { return false; }
 		}
 		// Center spaces // Even step //
